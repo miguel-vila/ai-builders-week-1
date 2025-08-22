@@ -5,47 +5,47 @@ import pandas as pd
 @st.cache_data
 def get_btc_data(start, end):
     """Download and cache BTC price data"""
-    return yf.download("BTC-USD", start=start, end=end, interval="1mo")['Close']
+    return yf.download("BTC-USD", start=start, end=end, interval="1d")['Close']
 
 def main():
     st.set_page_config(page_title="BTC DCA Calculator", page_icon="₿", layout="wide")
     start = '2009-01-01'
     end = '2025-08-21'
-    # get btc month to month data
+    # get btc daily data
     btc_data = get_btc_data(start, end)
     st.title("Bitcoin Dollar Cost Averaging (DCA) Calculator")
     
     # Sidebar controls
     st.sidebar.header("⚙️ Settings")
     investment_years = st.sidebar.slider("Investment Period (years)", 1, 10, 1)
-    investment_period = investment_years * 12
-    monthly_dca = st.sidebar.number_input("Monthly Investment ($)", min_value=1, max_value=10000, value=100, step=25)
+    investment_period = investment_years * 365  # days instead of months
+    daily_dca = st.sidebar.number_input("Daily Investment ($)", min_value=1, max_value=1000, value=10, step=5)
 
-    st.write(f"**Scenario:** Invest ${monthly_dca:,} the first of each month for {investment_years} years, then sell everything")
+    st.write(f"**Scenario:** Invest ${daily_dca:,} every day for {investment_years} years, then sell everything")
     st.caption("*Returns not adjusted for inflation or fees")
     st.caption("*yfinance only has BTC data starting from September 2014")
     
     st.subheader("BTC value")
     st.line_chart(btc_data)
-    btc_per_buy = monthly_dca / btc_data
+    btc_per_buy = daily_dca / btc_data
     btc_accum = btc_per_buy.rolling(investment_period, min_periods=investment_period).sum()
     # remove NaN values from rolling calculation
     btc_accum = btc_accum.dropna()
     
-    # Use BTC price from the following month for the investment value
+    # Use BTC price from the following day for the investment value
     investment_value = btc_accum * btc_data.shift(-1)
     
     # The shift operation will introduce a NaN for the last value, so we drop it
     investment_value = investment_value.dropna()
-    return_value = (investment_value / (investment_period * monthly_dca) - 1) * 100
+    return_value = (investment_value / (investment_period * daily_dca) - 1) * 100
     return_value = return_value.rename(columns={'BTC-USD': "Return (%)"})
     return_value.index.name = "Sell Date"
     
-    st.subheader(f"Rolling {investment_period // 12}-Year DCA Returns")
+    st.subheader(f"Rolling {investment_years}-Year DCA Returns")
     st.line_chart(return_value)
     
     # Calculate stats
-    total_invested = investment_period * monthly_dca
+    total_invested = investment_period * daily_dca
     median_return = return_value.median()['Return (%)']
     max_return = return_value.max()['Return (%)']
     min_return = return_value.min()['Return (%)']

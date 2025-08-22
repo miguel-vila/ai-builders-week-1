@@ -70,7 +70,7 @@ def main():
         perc_values = [return_value.quantile(p/100)['Return (%)'] for p in percentiles]
         perc_df = pd.DataFrame({
             'Percentile': [f'{p}th' for p in percentiles],
-            'Return (%)': [f'{v}%' for v in perc_values]
+            'Return (%)': [f'{v:.2f}%' for v in perc_values]
         })
         st.dataframe(perc_df, hide_index=True)
     

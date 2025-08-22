@@ -33,6 +33,7 @@ def main():
     investment_value = investment_value.dropna()
     return_value = (investment_value / (investment_period * monthly_dca) - 1) * 100
     return_value = return_value.rename(columns={'BTC-USD': "Return (%)"})
+    return_value.index.name = "Sell Date"
     st.subheader(f"Investment Return when selling after {investment_period // 12} years")
     st.line_chart(return_value)
 

@@ -20,8 +20,8 @@ def main():
     investment_years = st.sidebar.slider("Investment Period (years)", 1, 10, 1)
     investment_period = investment_years * 12
     monthly_dca = st.sidebar.number_input("Monthly Investment ($)", min_value=1, max_value=10000, value=100, step=25)
-    
-    st.write(f"**Scenario:** Invest ${monthly_dca:,} monthly for {investment_years} years, then sell everything")
+
+    st.write(f"**Scenario:** Invest ${monthly_dca:,} the first of each month for {investment_years} years, then sell everything")
     st.caption("*Returns not adjusted for inflation or fees")
     st.caption("*yfinance only has BTC data starting from September 2014")
     

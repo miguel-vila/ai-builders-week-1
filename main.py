@@ -23,6 +23,7 @@ def main():
     
     st.write(f"**Scenario:** Invest ${monthly_dca:,} monthly for {investment_years} years, then sell everything")
     st.caption("*Returns not adjusted for inflation or fees")
+    st.caption("*yfinance only has BTC data starting from September 2014")
     
     st.subheader("BTC value")
     st.line_chart(btc_data)
